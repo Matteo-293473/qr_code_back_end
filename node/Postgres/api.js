@@ -9,12 +9,8 @@ app.use(bp.json())
 app.use(bp.urlencoded({ extended: true }))
 
 
-
-
-
-
-// ci mettiamo in ascolto nella porta 3000
-app.listen('80', '192.168.0.108', ()=>{
+// ci mettiamo in ascolto nella porta 80
+app.listen('80', '192.168.31.107', ()=>{
     console.log("Sever in ascolto sulla porta 80");
 })
 
@@ -34,7 +30,7 @@ app.head('/',(req,res)=>{
 
     })
         
- });
+});
 
 
 app.post('/',(req,res) => {
