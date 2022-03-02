@@ -5,14 +5,15 @@ const bp = require('body-parser');
 const app = express();
 
 // dobbiamo usare questi metodi per poter setacciare i dati
-app.use(bp.json())
-app.use(bp.urlencoded({ extended: true }))
+app.use(bp.json());
+app.use(bp.urlencoded({ extended: true }));
 
 
 // ci mettiamo in ascolto nella porta 80
-app.listen('80', '192.168.31.107', ()=>{
-    console.log("Sever in ascolto sulla porta 80");
-})
+var server = app.listen('80', '192.168.31.107', ()=>{
+    var port = server.address().port;
+    console.log("Sever in ascolto sulla porta ", port);
+});
 
 
 client.connect();
@@ -25,11 +26,8 @@ app.head('/',(req,res)=>{
             res.status(500).send();
         }else {
             res.status(200).send();
-            //console.log(res);
         }
-
     })
-        
 });
 
 
