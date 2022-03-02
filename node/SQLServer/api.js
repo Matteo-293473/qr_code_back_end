@@ -61,22 +61,23 @@ app.head('/', function(req , res){
 
 app.post('/',(req,res) => {
     try {
-        let checkQuery = `select * from lettura where id_device = '${req.query.id}' 
+        let checkQuery = `select * from lettura where id_device = '${req.body.id}' 
         and orario_entrata IS NOT NULL and orario_uscita IS NULL` //ok
-        let checkDevice = `select * from dispositivo where id_device = '${req.query.id}'` //ok
+        let checkDevice = `select * from dispositivo where id_device = '${req.body.id}'` //ok
         // inserimento
-        let insertRowDevice = `insert into dispositivo values ('${req.query.id}')` //ok
-        let insertRowPrimaEntrata = `insert into lettura values ('${req.query.id}',CURRENT_TIMESTAMP,NULL,NULL,'${req.query.qrInfo}')` //ok
+        let insertRowDevice = `insert into dispositivo values ('${req.body.id}')` //ok
+        let insertRowPrimaEntrata = `insert into lettura values ('${req.body.id}',CURRENT_TIMESTAMP,NULL,NULL,'${req.body.qrInfo}')` //ok
         //modifica
         let alterRowSecondaEntrata = `update lettura
         set orario_uscita = CURRENT_TIMESTAMP
-        where id_device = '${req.query.id}'
-        and orario_entrata = (select orario_entrata from lettura where id_device = '${req.query.id}' 
+        where id_device = '${req.body.id}'
+        and orario_entrata = (select orario_entrata from lettura where id_device = '${req.body.id}' 
                                 and orario_entrata IS NOT NULL and orario_uscita IS NULL)`
 
+        console.log(req.body);
         // Gestione errori
-        if (req.query.qrInfo == '') throw new Error('missing qr info');
-        if (req.query.id == '') throw new Error('missing device id');
+        if (req.body.qrInfo == '') throw new Error('missing qr info');
+        if (req.body.id == '') throw new Error('missing device id');
 
         var dbConn = new sql.ConnectionPool(dbConfig);
 
