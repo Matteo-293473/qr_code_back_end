@@ -86,7 +86,8 @@ app.post('/',(req,res) => {
                             });
                         }else{
 
-                            // se siamo qui significa che non esiste un'entry e dobbiamo crearla
+                            // se siamo qui significa che non esiste un'entry e dobbiamo crearla oppure che abbiamo
+                            // scannerizzato un nuovo qr
                             request.query(insertRowPrimaEntrata,(err,result) => {
                                 if(err)  console.log(err.message);
                     

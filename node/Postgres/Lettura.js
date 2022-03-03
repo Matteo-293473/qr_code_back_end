@@ -5,7 +5,6 @@ class Lettura {
     }
 } 
 
-
 // lettura.id_persona},'${lettura.orario_entrata}',
 // '${lettura.orario_uscita}',
 // '${lettura.quantita
