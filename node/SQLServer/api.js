@@ -1,7 +1,7 @@
 const sql = require('mssql');
+const dbConfig = require('./connection.js');
 const express = require('express');
 const bp = require('body-parser');
-var cors = require('cors');
 
 const app = express(); 
  
@@ -15,22 +15,6 @@ var server = app.listen('80', '192.168.31.107', () => {
     var port = server.address().port;
     console.log("Sever in ascolto sulla porta ", port);
 });
-
-//Initializing connection string
-var dbConfig = {
-   user:  "SQLserver",
-   password: "sqlserver123",
-   server: "localhost",
-   database: "qrApp",
-   port: 1433,
-   options: {
-     trustedConnection: true,
-     encrypt: true,
-     enableArithAbort: true,
-     trustServerCertificate: true,
-   },
-};
-
 
 
 //HEAD
