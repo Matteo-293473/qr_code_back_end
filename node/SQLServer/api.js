@@ -44,7 +44,7 @@ app.head('/', function(req , res){
         var request = new sql.Request(dbConn);
         // Semplice query per verificare la connessione
         request.query("select 1").then(function (resp) {
-            console.log(resp);
+            console.log("richiesta head");
             res.status(200).send();
             dbConn.close();
         }).catch(function (err) {
@@ -85,7 +85,7 @@ app.post('/',(req,res) => {
             var request = new sql.Request(dbConn);
 
             request.query(checkDevice , (err, resp) => {
-                if(!err) console.log(err);
+                if(err) console.log(err);
                 if(resp.recordset.length > 0) {
                     // se siamo qui vuol dire che abbiamo già usato questo dispositivo
                     request.query(checkQuery, (err, resp) => {
@@ -93,7 +93,7 @@ app.post('/',(req,res) => {
                             // se siamo qui significa che esiste già una entry ed è la seconda volta
                             // che stiamo scannerizzando lo stesso qr
                             request.query(alterRowSecondaEntrata, (err,resp)=> {
-                                if(!err) console.log(err);
+                                if(err) console.log(err);
                                 
                                 console.log("inserito seconda volta!");
                                 res.send("Seconda scansione 2/2 ✔");
@@ -134,7 +134,7 @@ app.post('/',(req,res) => {
         console.log(e.message);
         res.send("error " + e.message + " ❌");
     }finally{
-        dbConn.close();
+        //dbConn.close();
     }
 
 })
