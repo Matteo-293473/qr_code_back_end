@@ -8,7 +8,6 @@ const app = express();
 // dobbiamo usare questi metodi per poter setacciare i dati
 app.use(bp.json());
 app.use(bp.urlencoded({ extended: true }));
-//app.use(cors());
 
 
 // ci mettiamo in ascolto nella porta 80
@@ -32,12 +31,9 @@ var dbConfig = {
    },
 };
 
-// var dbConn = new sql.ConnectionPool(dbConfig);
-// dbConn.connect();
 
 
-
-//GET API
+//HEAD
 app.head('/', function(req , res){
 	var dbConn = new sql.ConnectionPool(dbConfig);
     dbConn.connect().then(function () {
@@ -59,31 +55,35 @@ app.head('/', function(req , res){
 });
 
 
+//POST
 app.post('/',(req,res) => {
     try {
+
+        // QUERY -----------------------------------------------------------------------
         let checkQuery = `select * from lettura where id_device = '${req.body.id}' 
-        and orario_entrata IS NOT NULL and orario_uscita IS NULL` //ok
-        let checkDevice = `select * from dispositivo where id_device = '${req.body.id}'` //ok
+        and orario_entrata IS NOT NULL and orario_uscita IS NULL` 
+        let checkDevice = `select * from dispositivo where id_device = '${req.body.id}'` 
         // inserimento
-        let insertRowDevice = `insert into dispositivo values ('${req.body.id}')` //ok
-        let insertRowPrimaEntrata = `insert into lettura values ('${req.body.id}',CURRENT_TIMESTAMP,NULL,NULL,'${req.body.qrInfo}')` //ok
+        let insertRowDevice = `insert into dispositivo values ('${req.body.id}')` 
+        let insertRowPrimaEntrata = `insert into lettura values ('${req.body.id}',CURRENT_TIMESTAMP,NULL,NULL,'${req.body.qrInfo}')` 
         //modifica
         let alterRowSecondaEntrata = `update lettura
         set orario_uscita = CURRENT_TIMESTAMP
         where id_device = '${req.body.id}'
         and orario_entrata = (select orario_entrata from lettura where id_device = '${req.body.id}' 
                                 and orario_entrata IS NOT NULL and orario_uscita IS NULL)`
+        // ----------------------------------------------------------------------------
 
-        console.log(req.body);
-        // Gestione errori
+        // Gestione errori --------------------------------------------
         if (req.body.qrInfo == '') throw new Error('missing qr info');
         if (req.body.id == '') throw new Error('missing device id');
+        // ------------------------------------------------------------
+
+        console.log(req.body);
 
         var dbConn = new sql.ConnectionPool(dbConfig);
-
         dbConn.connect(function () {
             var request = new sql.Request(dbConn);
-
             request.query(checkDevice , (err, resp) => {
                 if(err) console.log(err);
                 if(resp.recordset.length > 0) {
@@ -133,39 +133,5 @@ app.post('/',(req,res) => {
     }catch(e){
         console.log(e.message);
         res.send("error " + e.message + " ❌");
-    }finally{
-        //dbConn.close();
     }
-
 })
-
-
-
-
-// function insertEmployees() {
-//     var dbConn = new sql.Connection(dbConfig);
-//     dbConn.connect().then(function () {
-// 		var transaction = new sql.Transaction(dbConn);
-// 		transaction.begin().then(function () {
-// 			var request = new sql.Request(transaction);
-//             request.query("INSERT INTO employee (name,salary,age) VALUES (req.body.name,req.body.salary,req.body.age")
-// 			.then(function 	() {
-// 				transaction.commit().then(function (resp) {
-//                     console.log(resp);
-//                     dbConn.close();
-//                 }).catch(function (err) {
-//                     console.log("Error in Transaction Commit " + err);
-//                     dbConn.close();
-//                 });
-// 			}).catch(function (err) {
-//                 console.log("Error in Transaction Begin " + err);
-//                 dbConn.close();
-//             })
-// 		}).catch(function (err) {
-//             console.log(err);
-//             dbConn.close();
-//         }).catch(function (err) {
-//         //12.
-//         console.log(err);
-//     });
-//   });
