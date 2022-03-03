@@ -1,4 +1,4 @@
-//Initializing connection string
+// impostazioni della connessione
 var dbConfig = {
     user:  "SQLserver",
     password: "sqlserver123",

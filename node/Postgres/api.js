@@ -19,7 +19,6 @@ var server = app.listen('80', '192.168.31.107', ()=>{
 client.connect();
 
 
-
 app.head('/',(req,res)=>{
     client.query('select now()', (err,re)=> {
         if(err) {
@@ -35,8 +34,7 @@ app.post('/',(req,res) => {
     //const {id_device} = req.body;
     try
     {
-        // QUERY
-        
+        // QUERY -----------------------------------------------------------------------
         // selezione
         let checkQuery = `select * from lettura where id_device = '${req.body.id}' 
         and orario_entrata IS NOT NULL and orario_uscita IS NULL and qrInfo='${req.body.qrInfo}'`
@@ -50,9 +48,9 @@ app.post('/',(req,res) => {
         where id_device = '${req.body.id}'
         and orario_entrata = (select orario_entrata from lettura where id_device = '${req.body.id}' 
                                 and orario_entrata IS NOT NULL and orario_uscita IS NULL)`
+        // ----------------------------------------------------------------------------
 
-
-
+        // Gestione errori --------------------------------------------
         console.log(req.body);
         // Gestione errori
         if (req.body.qrInfo == '') throw new Error('missing qr info');
@@ -60,7 +58,6 @@ app.post('/',(req,res) => {
         
         console.log(req.body);
 
-        
         client.query(checkDevice ,(err,result) => {
             if(err) console.log("errore");
             if(result.rows.length > 0){
@@ -77,8 +74,6 @@ app.post('/',(req,res) => {
                             console.log("inserito seconda volta!");
                             res.send("Seconda scansione 2/2 ✔");
                         });
-                        
-
                     }else{
 
                         // se siamo qui significa che non esiste un'entry e dobbiamo crearla
@@ -87,7 +82,6 @@ app.post('/',(req,res) => {
                             console.log("inserito prima volta (dispositivo già esistente)!");
                             res.send("Prima scansione 1/2 ✔");
                         });
-
                     }
                 });
 
@@ -95,7 +89,7 @@ app.post('/',(req,res) => {
 
                 // se siamo qui significa che è la prima volta che scannerizziamo con questo
                 // device
-            console.log("mai usato"); 
+                console.log("mai usato"); 
 
                 client.query(insertRowDevice, (err,result) => {
                     if(err) console.log(err.message);
@@ -108,10 +102,7 @@ app.post('/',(req,res) => {
                             res.send("Registrato device, Prima scansione 1/2 ✔");
                     });
                 });
-    
-
             }
-
         });
 
     }

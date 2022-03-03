@@ -44,6 +44,7 @@ app.post('/',(req,res) => {
     try {
 
         // QUERY -----------------------------------------------------------------------
+        // selezione
         let checkQuery = `select * from lettura where id_device = '${req.body.id}' 
         and orario_entrata IS NOT NULL and orario_uscita IS NULL and qrInfo='${req.body.qrInfo}'` 
         let checkDevice = `select * from dispositivo where id_device = '${req.body.id}'` 
