@@ -81,66 +81,54 @@ app.post('/',(req,res) => {
 
         var dbConn = new sql.ConnectionPool(dbConfig);
 
-        dbConn.connect().then(function () {
-            
-            var transaction = new sql.Transaction(dbConn);
-		    transaction.begin().then(function () {
-                var request = new sql.Request(transaction);
+        dbConn.connect(function () {
+            var request = new sql.Request(dbConn);
 
-                request.query(checkDevice).then(function (resp) {
-                    if(!err) console.log(err);
-                
-                    if(resp.rows.length > 0) {
-                        // se siamo qui vuol dire che abbiamo già usato questo dispositivo
-                        request.query(checkQuery).then(function (resp) {
-                            if(result.rows.length > 0){
-                                // se siamo qui significa che esiste già una entry ed è la seconda volta
-                                // che stiamo scannerizzando lo stesso qr
-                                request.query(alterRowSecondaEntrata, (err,resp)=> {
-                                    if(!err) console.log(err);
-                                    transaction.commit().then(function (resp) {
-                                        console.log("inserito seconda volta!");
-                                        result.send("Seconda scansione 2/2 ✔");
-                                        dbConn.close();
-                                    }).catch(function (err) {
-                                        console.log("Error in Transaction Commit " + err);
-                                        dbConn.close();
-                                    });
-                                });
-                            }else{
-
-                                // se siamo qui significa che non esiste un'entry e dobbiamo crearla
-                                request.query(insertRowPrimaEntrata,(err,result) => {
-                                    if(err)  console.log(err.message);
-                                    transaction.commit().then(function (resp) {
-                                        console.log("inserito prima volta (dispositivo già esistente)!");
-                                        result.send("Prima scansione 1/2 ✔");
-                                        dbConn.close();
-                                    });
-                                });
-                            }
-                        });
-            
-                    }else{
-                        // se siamo qui significa che è la prima volta che scannerizziamo con questo
-                        // device
-                        console.log("mai usato"); 
-                        request.query(insertRowDevice, (err,result) => {
-                            if(err) console.log(err.message);
-                            console.log("device inserito!");
-                            // ora inseriamo l'entry per la prima volta
-                            transaction.commit().then(function (resp) {
-                                request.query(insertRowPrimaEntrata,(err,result) => {
-                                    if(err)  console.log(err.message);
-                                    console.log("inserito prima volta!");
-                                    result.send("Registrato device, Prima scansione 1/2 ✔");
-                                    dbConn.close();
-                                });
+            request.query(checkDevice , (err, resp) => {
+                if(!err) console.log(err);
+                if(resp.recordset.length > 0) {
+                    // se siamo qui vuol dire che abbiamo già usato questo dispositivo
+                    request.query(checkQuery, (err, resp) => {
+                        if(resp.recordset.length > 0){
+                            // se siamo qui significa che esiste già una entry ed è la seconda volta
+                            // che stiamo scannerizzando lo stesso qr
+                            request.query(alterRowSecondaEntrata, (err,resp)=> {
+                                if(!err) console.log(err);
+                                
+                                console.log("inserito seconda volta!");
+                                res.send("Seconda scansione 2/2 ✔");
+                            
                             });
+                        }else{
+
+                            // se siamo qui significa che non esiste un'entry e dobbiamo crearla
+                            request.query(insertRowPrimaEntrata,(err,result) => {
+                                if(err)  console.log(err.message);
+                    
+                                console.log("inserito prima volta (dispositivo già esistente)!");
+                                res.send("Prima scansione 1/2 ✔");
+                            
+                            });
+                        }
+                    });
+        
+                }else{
+                    // se siamo qui significa che è la prima volta che scannerizziamo con questo
+                    // device
+                    console.log("mai usato"); 
+                    request.query(insertRowDevice, (err,result) => {
+                        if(err) console.log(err.message);
+                        console.log("device inserito!");
+                        // ora inseriamo l'entry per la prima volta
+                        request.query(insertRowPrimaEntrata,(err,result) => {
+                            if(err)  console.log(err.message);
+                            console.log("inserito prima volta!");
+                            res.send("Registrato device, Prima scansione 1/2 ✔");
                         });
-                    }
-                });
+                    });
+                }
             });
+
         });
     }catch(e){
         console.log(e.message);
