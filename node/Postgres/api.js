@@ -1,13 +1,15 @@
+// librerie
 const client = require('./connection.js');
 const express = require('express');
 const bp = require('body-parser');
+const cors = require("cors");
 
 const app = express();
 
 // dobbiamo usare questi metodi per poter setacciare i dati
 app.use(bp.json());
 app.use(bp.urlencoded({ extended: true }));
-
+app.use(cors()); // serve per poter accedere da browser
 
 // ci mettiamo in ascolto nella porta 80
 var server = app.listen('80', '192.168.31.107', ()=>{
@@ -18,8 +20,9 @@ var server = app.listen('80', '192.168.31.107', ()=>{
 
 client.connect();
 
-
+// HEAD
 app.head('/',(req,res)=>{
+    // verifica della connessione
     client.query('select now()', (err,re)=> {
         if(err) {
             res.status(500).send();
@@ -29,9 +32,8 @@ app.head('/',(req,res)=>{
     })
 });
 
-
+// POST
 app.post('/',(req,res) => {
-    //const {id_device} = req.body;
     try
     {
         // QUERY -----------------------------------------------------------------------
@@ -47,17 +49,17 @@ app.post('/',(req,res) => {
         set orario_uscita = now()
         where id_device = '${req.body.id}'
         and orario_entrata = (select orario_entrata from lettura where id_device = '${req.body.id}' 
-                                and orario_entrata IS NOT NULL and orario_uscita IS NULL)`
+                              and orario_entrata IS NOT NULL and orario_uscita IS NULL and qrInfo = '${req.body.qrInfo}')`
         // ----------------------------------------------------------------------------
 
         // Gestione errori --------------------------------------------
-        console.log(req.body);
-        // Gestione errori
         if (req.body.qrInfo == '') throw new Error('missing qr info');
         if (req.body.id == '') throw new Error('missing device id');
-        
+        // ------------------------------------------------------------
+
         console.log(req.body);
 
+        // invio delle query
         client.query(checkDevice ,(err,result) => {
             if(err) console.log("errore");
             if(result.rows.length > 0){
@@ -108,10 +110,12 @@ app.post('/',(req,res) => {
     }
     catch(e)
     {
+        // stampa e risposta di eventuali errori
         console.log(e.message);
         res.send("error " + e.message + " ❌");
     }
     finally{
+        // chiudo la connessione al server
         client.end;
     }
 });

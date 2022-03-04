@@ -1,14 +1,16 @@
+// librerie
 const sql = require('mssql');
 const dbConfig = require('./connection.js');
 const express = require('express');
 const bp = require('body-parser');
+const cors = require("cors");
 
 const app = express(); 
  
 // dobbiamo usare questi metodi per poter setacciare i dati
 app.use(bp.json());
 app.use(bp.urlencoded({ extended: true }));
-
+app.use(cors()); // serve per poter accedere da browser
 
 // ci mettiamo in ascolto nella porta 80
 var server = app.listen('80', '192.168.31.107', () => {
@@ -19,12 +21,13 @@ var server = app.listen('80', '192.168.31.107', () => {
 
 //HEAD
 app.head('/', function(req , res){
+    // connessione al server
 	var dbConn = new sql.ConnectionPool(dbConfig);
     dbConn.connect().then(function () {
         var request = new sql.Request(dbConn);
-        // Semplice query per verificare la connessione
+        // query per verificare la connessione
         request.query("select 1").then(function (resp) {
-            console.log("richiesta head");
+            //console.log("richiesta head");
             res.status(200).send();
             dbConn.close();
         }).catch(function (err) {
@@ -33,6 +36,8 @@ app.head('/', function(req , res){
             dbConn.close();
         });
     }).catch(function (err) {
+
+        // stampa e risposta di eventuali errori
         res.status(500).send();
         console.log(err);
     });
@@ -46,7 +51,7 @@ app.post('/',(req,res) => {
         // QUERY -----------------------------------------------------------------------
         // selezione
         let checkQuery = `select * from lettura where id_device = '${req.body.id}' 
-        and orario_entrata IS NOT NULL and orario_uscita IS NULL and qrInfo='${req.body.qrInfo}'` 
+        and orario_entrata IS NOT NULL and orario_uscita IS NULL and qrInfo = '${req.body.qrInfo}'` 
         let checkDevice = `select * from dispositivo where id_device = '${req.body.id}'` 
         // inserimento
         let insertRowDevice = `insert into dispositivo values ('${req.body.id}')` 
@@ -56,7 +61,7 @@ app.post('/',(req,res) => {
         set orario_uscita = CURRENT_TIMESTAMP
         where id_device = '${req.body.id}'
         and orario_entrata = (select orario_entrata from lettura where id_device = '${req.body.id}' 
-                                and orario_entrata IS NOT NULL and orario_uscita IS NULL)`
+                                and orario_entrata IS NOT NULL and orario_uscita IS NULL and qrInfo = '${req.body.qrInfo}')`
         // ----------------------------------------------------------------------------
 
         // Gestione errori --------------------------------------------
@@ -65,7 +70,8 @@ app.post('/',(req,res) => {
         // ------------------------------------------------------------
 
         console.log(req.body);
-
+        
+        // connessione al server
         var dbConn = new sql.ConnectionPool(dbConfig);
         dbConn.connect(function () {
             var request = new sql.Request(dbConn);
@@ -117,6 +123,8 @@ app.post('/',(req,res) => {
 
         });
     }catch(e){
+
+        // stampa e risposta di eventuali errori
         console.log(e.message);
         res.send("error " + e.message + " ❌");
     }
