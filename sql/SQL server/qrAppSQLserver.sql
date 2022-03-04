@@ -4,7 +4,7 @@
 -- creazione delle tabelle
 
 
-------------------------------------------------- 
+-------------------------------------------------------------
 
 /* CREATE TABLE persona(
     id_persona serial primary key
@@ -25,19 +25,23 @@ CREATE TABLE lettura(
     primary key (id_persona,orario_entrata)
 ); */
 
-------------------------------------------------- 
+------------------------------------------------------------- 
+-- SQL server -----------------------------------------------
 
-CREATE TABLE dispostivo(
+CREATE TABLE dispositivo(
     id_device varchar(30) primary key
     
 );
 
 CREATE TABLE lettura(
     id_device varchar(30),
-    orario_entrata timestamp default now(),
-    orario_uscita timestamp default now(),
+    orario_entrata DATETIME,
+    orario_uscita DATETIME,
     quantita int,
     qrInfo varchar(200),
     foreign key (id_device) references dispostivo(id_device),
     primary key (id_device,orario_entrata)
 );
+
+
+------------------------------------------------------------- 
