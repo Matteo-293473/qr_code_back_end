@@ -87,7 +87,7 @@ app.post('/',(req,res) => {
                                 if(err) console.log(err);
                                 
                                 console.log("inserito seconda volta!");
-                                res.send("Seconda scansione 2/2 ✔");
+                                res.send("Second scan 2/2 ✔");
                             
                             });
                         }else{
@@ -98,7 +98,7 @@ app.post('/',(req,res) => {
                                 if(err)  console.log(err.message);
                     
                                 console.log("inserito prima volta (dispositivo già esistente)!");
-                                res.send("Prima scansione 1/2 ✔");
+                                res.send("First scan 1/2 ✔");
                             
                             });
                         }
@@ -115,7 +115,7 @@ app.post('/',(req,res) => {
                         request.query(insertRowPrimaEntrata,(err,result) => {
                             if(err)  console.log(err.message);
                             console.log("inserito prima volta!");
-                            res.send("Registrato device, Prima scansione 1/2 ✔");
+                            res.send("Device has been registered, first scan 1/2 ✔");
                         });
                     });
                 }
