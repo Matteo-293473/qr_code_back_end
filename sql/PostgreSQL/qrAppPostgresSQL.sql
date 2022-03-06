@@ -15,7 +15,7 @@ CREATE TABLE lettura(
     orario_uscita timestamp default now(),
     quantita int,
     qrInfo varchar(200),
-    foreign key (id_device) references dispostivo(id_device),
+    foreign key (id_device) references dispositivo(id_device),
     primary key (id_device,orario_entrata)
 );
 
